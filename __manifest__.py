@@ -24,6 +24,7 @@
         'views/crm_team_inherit_views.xml',
         'views/inherit_res_partner_views.xml',
         'views/inherit_hr_employee_views.xml',
+        'views/request_type_view.xml',
 
         # report
         'report/report_quotation.xml',
