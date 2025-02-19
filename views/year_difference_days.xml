@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="year_difference_days_view_tree" model="ir.ui.view">
+            <field name="name">year_difference_days_view_tree</field>
+            <field name="model">year.difference.days</field>
+            <field name="arch" type="xml">
+                <tree string="Ngày chênh lệch năm" editable="bottom">
+                    <field name="from_date"/>
+                    <field name="to_date"/>
+                    <field name="days"/>
+                </tree>
+            </field>
+        </record>
+        <record id="year_difference_days_view_form" model="ir.ui.view">
+            <field name="name">year_difference_days_view_form</field>
+            <field name="model">year.difference.days</field>
+            <field name="arch" type="xml">
+                <form string="Ngày chênh lệch năm">
+                    <sheet>
+                        <group>
+                            <field name="from_date"/>
+                            <field name="to_date"/>
+                            <field name="days"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_year_difference_days" model="ir.actions.act_window">
+            <field name="name">Ngày chênh lệch năm</field>
+            <field name="res_model">year.difference.days</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_year_difference_days"
+                  name="Ngày chênh lệch năm"
+                  parent="sale.menu_sale_config"
+                  action="action_year_difference_days"
+                  sequence="12"/>
+    </data>
+</odoo>

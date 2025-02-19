@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="external_layout_quotation_report_standard">
+        <div t-attf-class="header o_company_#{company.id}_layout" style="font-family:Arial;">
+            <table style="height:100px;border:0; border-color: transparent;">
+                <tbody >
+                    <td name="td_logo" class="text-center align-middle"  style="width:20%;">
+                        <div>
+                            <div class="col-3 mb4" >
+                                <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="width:100px;height:100px;" alt="Logo"/>
+                            </div>
+                            <div class="col-9 text-right" style="margin-top:5px;" t-field="company.report_header" name="moto"/>
+                        </div>
+                    </td>
+                    <td name="td_address" class="text-left " style="width:79%;">
+                        <div style="margin-left: 10px;">
+                            <div ></div>
+                            <b><span style="font-size:22pt" t-field="o.company_id.name" /></b>
+                            <br></br>
+                            <b style="font-size:18pt" ><span>Địa chỉ:</span></b>
+                            <span style="font-size:18pt" t-field="o.company_id.street"/>,
+                            <span style="font-size:18pt" t-field="o.company_id.city"/>.
+
+                        </div>
+                    </td>
+
+
+                </tbody>
+            </table>
+<!--             class="row zero_min_height"-->
+             <div t-if="company.logo or company.report_header" style="margin-top:1px;">
+                <div class="col-12">
+                    <div style="border-top: 1px solid black;"/>
+                </div>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div>
+                <!-- This div ensures that the address is not cropped by the header. -->
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer o_company_#{company.id}_layout" style="height: 30px !important;">
+            <div class="text-center" style="border-top: 1px solid black;">
+                <div t-if="report_type == 'pdf'" class="text-muted">
+                    Trang: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="external_layout_quotation_report">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+        <t t-call="enmasys_sale.external_layout_quotation_report_standard"><t t-out="0"/></t>
+
+    </template>
+
+    <template id="report_quotation_document">
+        <t t-call="enmasys_sale.external_layout_quotation_report">
+            <div  style="font-family:Arial;">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+                <t t-set="forced_vat" t-value="doc.fiscal_position_id.foreign_vat"/>
+                <t t-set="address">
+                </t>
+                <center>
+                    <div style="font-size: 22pt;color: black;">
+                        <b><span>BÁO GIÁ</span></b>
+                    </div>
+
+                        <div style="margin-top:2px;font-size: 15pt;">
+                            <b>
+                                <span>Số:</span>
+                                <span t-field="doc.name"/>
+                            </b>
+                        </div>
+                        <div style="margin-top:2px;">
+                             <span>Ngày</span>
+                            <span t-esc="datetime.datetime.strptime(str(doc._get_date_order()), '%Y-%m-%d').strftime('%d')"/>
+                            <span>Tháng</span>
+                            <span t-esc="datetime.datetime.strptime(str(doc._get_date_order()), '%Y-%m-%d').strftime('%m')"/>
+                             <span>Năm</span>
+                            <span t-esc="datetime.datetime.strptime(str(doc._get_date_order()), '%Y-%m-%d').strftime('%Y')"/>
+                        </div>
+
+                </center>
+
+                <div style="margin-left: 2%;margin-top: 2%;margin-bottom: 2%;color: black;">
+                    <div style="font-size: 16pt;">
+                        <b><span>Kính gửi: </span>  <span t-field="doc.partner_id.name"/></b>
+                    </div>
+                    <div>
+                        <span t-field="doc.company_id.name"/>
+                        <span><![CDATA[&nbsp;]]></span>
+                        <span> xin trân trọng báo giá như sau:</span>
+                    </div>
+                </div>
+                <table style="margin-left: 2%;width:97%;border: 1px solid black !important; border-collapse: collapse;">
+                    <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                    <thead style="display: table-row-group;  border: 1px solid black !important;background-color:#50c7f3;">
+                        <tr>
+                            <th name="th_number" class="text-center align-middle" style="width:5%;color: black;border-right: 1px solid black;">STT</th>
+                            <th name="th_product" class="text-center align-middle" style="width:36% ;color: black;border-right: 1px solid black;">Sản phẩm</th>
+                            <th name="th_property" class="text-center align-middle" style="width:9%;color: black;border-right: 1px solid black;">Thuộc tính</th>
+                            <th name="th_uom" class="text-center align-middle" style="width:7%;color: black;border-right: 1px solid black;">ĐVT</th>
+                            <th name="th_quantity" class="text-center align-middle" style="width:12%;color: black;border-right: 1px solid black;">Số lượng</th>
+                            <th name="th_priceunit" class="text-center align-middle" style="width:14%;color: black;border-right: 1px solid black;">Đơn giá</th>
+<!--                            <th name="th_discount" class="text-center align-middle" style="width:12%;color: black;border-right: 1px solid black;">Chiết khấu</th>-->
+                            <th name="th_pricesubtotal" class="text-center align-middle" style="width:15%;color: black;border-right: 1px solid black;">Thành tiền</th>
+<!--                            <th name="th_print" class="text-center align-middle" style="width:5%;color: black;border-right: 1px solid black;">In</th>-->
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-set="report_sale_order_line" t-value="doc.get_report_sale_order_line()" />
+                        <t t-foreach="report_sale_order_line" t-as="line">
+<!--                            <t t-esc="report_sale_order_line[line]"/>-->
+                            <tr style="border: 1px solid black;">
+                                <t >
+                                    <td name="td_number" class="text-center align-middle" style="border-right: 1px solid black;"><span  t-esc="report_sale_order_line[line]['number']"/></td>
+                                    <td name="td_product" class="text-center align-middle" style="border-right: 1px solid black;text-align:left !important; padding-left:4px"><span t-esc="report_sale_order_line[line]['product_name']"/></td>
+                                    <td name="td_property" class="text-center align-middle" style="border-right: 1px solid black;"><span t-esc="report_sale_order_line[line]['x_product_template_variant_value_ids']"/></td>
+                                    <td name="td_uom" class="text-center align-middle" style="border-right: 1px solid black;"><span t-esc="report_sale_order_line[line]['product_uom']" /></td>
+                                    <td name="td_quantity" class="text-end align-middle" style="border-right: 1px solid black;padding-right:4px !important;"><span t-esc="'{:,.0f}'.format(report_sale_order_line[line]['product_uom_qty'])"/></td>
+                                    <td name="td_priceunit" class="text-end align-middle" style="border-right: 1px solid black;padding-right:4px !important;"><span t-esc="'{:,.0f}'.format(report_sale_order_line[line]['price_unit'])"/></td>
+<!--                                    <td name="td_discount" class="text-right align-middle" style="border-right: 1px solid black;padding-right:4px !important;"><span t-esc="'{:,.0f}'.format(doc.compute_report_sale_order_line()[line]['discount'])"/><span>%</span></td>-->
+                                    <td name="td_pricesubtotal" class="text-end align-middle" style="border-right: 1px solid black;padding-right:4px !important;"><span t-esc="'{:,.0f}'.format(report_sale_order_line[line]['price_subtotal'])"/></td>
+<!--                                    <td name="td_print" class="text-center align-middle" style="border-right: 1px solid black;">-->
+<!--                                        <span alt="Invoice" t-if="report_sale_order_line[line]['print'] == True">-->
+<!--                                            <input type="checkbox" name="attrib"  checked="True"/>-->
+<!--                                        </span>-->
+<!--                                        <span alt="Invoice" t-else="">-->
+<!--                                            <input type="checkbox" name="attrib"  />-->
+<!--                                        </span>-->
+<!--                                    </td>-->
+
+                                </t>
+                            </tr>
+                        </t>
+                        <tr style="border: 1px solid black;color: black;">
+                                <t >
+                                    <td name="td_number" class="text-center align-middle" ><span  /></td>
+                                    <td name="td_product" class="text-center align-le">
+                                        <b>
+                                            <span>Tổng cộng</span>
+                                        </b>
+                                    </td>
+                                    <td name="td_property" class="text-center align-middle"><span /></td>
+                                    <td name="td_uom" class="text-center align-middle"><span /></td>
+                                    <td name="td_quantity" class="text-end align-middle" style="border-right: 1px solid black;padding-right:4px !important;"><span>
+                                        <b>
+                                            <span t-esc="doc.sum_quantity_line()"/>
+                                        </b>
+                                    </span></td>
+<!--                                    <td name="td_discount" class="text-right align-middle" style="border-right: 1px solid black;padding-right:4px !important;"><span/></td>-->
+                                    <td name="td_priceunit" class="text-center align-middle"><span />
+
+                                    </td>
+                                    <td name="td_pricesubtotal" class="text-end align-middle" style="padding-right:4px !important;">
+                                        <b>
+                                            <span t-esc="doc._get_sum_price_subtotal()"/>
+
+                                        </b>
+                                    </td>
+<!--                                    <td name="td_print" class="text-center align-middle"><span>-->
+
+<!--                                    </span>-->
+<!--                                    </td>-->
+
+                                </t>
+                            </tr>
+
+                    </tbody>
+                </table>
+                <div  style="width:100%;display:inline-block;vertical-align: top;">
+                    <div style="display:inline-block;width:59.5%;">
+<!--                        <div style="margin-left: 2%;margin-top: 2%;margin-bottom: 2%;color: black;">-->
+<!--                            <div style="margin-left: 2%;margin-top: 2%;margin-bottom: 2%;">-->
+<!--                                <b><span>Ghi chú:</span></b>-->
+<!--                                <span t-field="doc.x_note"/>-->
+<!--                            </div>-->
+<!--                            <div style="margin-left: 20%;margin-top: 15%;margin-bottom: 2%;">-->
+<!--                                    <img t-att-src="image_data_uri(doc.create_qr_code())" style="width:150px;height:150px;" />-->
+
+<!--                            </div>-->
+<!--                            <div style="margin-left: 11%;margin-top: 3%;margin-bottom: 2%;">-->
+<!--                                    Vui lòng quét mã QR để thanh toán-->
+<!--                            </div>-->
+<!--                        </div>-->
+                    </div>
+                    <div style="display:inline-block;width:40%;vertical-align: top;margin-top:9pt">
+                        <table style="border:0; border-color: transparent;">
+                            <tbody>
+                                 <tr style="font-size:13pt;">
+                                        <td name="total_order_name" style="width:60%;"><b><span>Tổng chưa thuế :</span></b></td>
+                                     <td name="total_order" class="text-end align-middle" style="width:40%;"> <span t-esc="doc._get_amount_untaxed()"/></td>
+<!--                                        <t t-if="doc.report_tax_totals_json()">-->
+<!--                                        <td name="total_order" class="text-right align-middle" style="width:40%;"> <span t-esc="'{:,.0f}'.format(doc.report_tax_totals_json_subprice_untaxed())"/></td>-->
+<!--                                         </t>-->
+<!--                                        <t t-else="">-->
+<!--                                            <td name="total_order" class="text-right align-middle" style="width:40%;">-->
+<!--                                                <span t-esc="'{:,.0f}'.format(doc.report_tax_totals_json_subprice_amount())"/>-->
+<!--                                            </td>-->
+<!--                                        </t>-->
+                                    </tr>
+
+                                <t t-if="doc._data_report_tax()">
+                                    <t t-foreach="doc._data_report_tax()" t-as="line">
+                                        <t >
+                                             <tr style="font-size:13pt;">
+                                                <td name="tax_name" style="width:60%;"><b><span t-esc="line['name']"/>:</b></td>
+                                                <td name="tax" class="text-end align-middle" style="width:40%;"><span t-esc="'{:,.0f}'.format(line['total'])"/></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </t>
+                                <tr style="font-size:13pt;">
+                                    <td name="total_order_name" style="width:60%;"><b><span>Tổng cộng đơn hàng :</span></b></td>
+                                    <td name="total_order" class="text-end align-middle" style="width:40%;"><span t-esc="doc._get_amount_total()"/></td>
+                                </tr>
+<!--                                 <tr style="font-size:13pt;">-->
+<!--                                    <td name="debt_old_name" style="width:60%;"><b><span>Công nợ cũ :</span></b></td>-->
+<!--                                     <td name="debt_old" class="text-right align-middle" style="width:40%;"><span t-esc="doc.get_debt()"/></td>-->
+<!--                                </tr>-->
+<!--                                <tr style="font-size:13pt;">-->
+<!--                                    <td name="customer_paid_name" style="width:60%;"><b><span>KH thanh toán :</span></b></td>-->
+<!--                                    <td name="customer_paid" class="text-right align-middle" style="width:40%;"><span t-esc="'{:,.0f}'.format(doc.amount_paid())"/></td>-->
+<!--                                </tr>-->
+<!--                                <tr style="font-size:13pt;">-->
+<!--                                    <td name="debt_new_name" style="width:60%;"><b><span>Công nợ mới :</span></b></td>-->
+<!--                                    <td name="debt_new" class="text-right align-middle" style="width:40%;"><t t-if="doc._new_debt()"><span t-esc="doc._new_debt()"/></t></td>-->
+<!--                                </tr>-->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="report_quotation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="enmasys_sale.report_quotation_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+</odoo>

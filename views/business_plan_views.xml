@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="business_plan_view_tree" model="ir.ui.view">
+        <field name="name">business.plan.view.tree</field>
+        <field name="model">business.plan</field>
+        <field name="arch" type="xml">
+            <tree string="">
+                <field name="name" />
+                <field name="year" />
+                <!-- <field name="actual_revenue" /> -->
+                <field name="target_revenue" />
+                <field name="status" />
+            </tree>
+        </field>
+    </record>
+    <record id="business_plan_view_form" model="ir.ui.view">
+        <field name="name">business.plan.view.form</field>
+        <field name="model">business.plan</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <header>
+                    <button string="Confirm" name="action_confirm" type="object" class="oe_highlight"
+                            invisible="status == 'confirm'"/>
+                    <!--                    <button string="Import" name="action_import" type="object" class="oe_highlight" />-->
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_target" type="object" class="oe_stat_button" icon="fa-">
+                            <field name="sale_target_count" string="Target details" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="is_user" invisible="1"/>
+                        <field name="name" />
+                        <field name="year" />
+                        <field name="actual_revenue" />
+                        <field name="target_revenue" />
+                        <field name="total_annual_revenue" />
+                    </group>
+                    <notebook>
+                        <page name="sale_target" string="Sales target">
+                            <!-- <button string="Cập nhật thực tế" name="action_update_actual_revenue_sale_target" type="object" class="oe_highlight"/> -->
+                            <field name="sale_target_ids">
+                                <tree editable="bottom">
+                                    <field name="month" />
+                                    <field name="date_from" />
+                                    <field name="date_to" />
+                                    <field name="partner_group_id" />
+                                    <field name="store_id" />
+                                    <field name="user_id" domain="[('employee_id.department_id', '=', store_id)]"/>
+                                    <field name="target_revenue" force_save="1" widget="float_no_decimal"/>
+                                    <field name="actual_revenue" widget="float_no_decimal"/>
+                                    <field name="year" invisible="1" />
+                                    <field name="rate_achieved" widget="percentage"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="business_plan_action" model="ir.actions.act_window">
+        <field name="name">Business plan</field>
+        <field name="res_model">business.plan</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        id="business_plan_sub_menu"
+        name="Business plan"
+        parent="sale.sale_menu_root"
+        sequence="10"/>
+    <menuitem
+        id="business_plan_menu"
+        name="Business plan"
+        parent="business_plan_sub_menu"
+        action="business_plan_action"
+        sequence="1"/>
+</odoo>
