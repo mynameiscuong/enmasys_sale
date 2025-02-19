@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="customer_history_view_tree" model="ir.ui.view">
+        <field name="name">customer.history.view.tree</field>
+        <field name="model">customer.history</field>
+        <field name="arch" type="xml">
+            <tree string="Lịch sử khách hàng">
+                <field name="customer_id" />
+                <field name="date" />
+                <field name="responsible_employee_id" />
+                <field name="interested_products_display"/>
+                <field name="request_types_display"/>
+                <field name="note" />
+            </tree>
+        </field>
+    </record>
+    <record id="customer_history_view_form" model="ir.ui.view">
+        <field name="name">customer.history.view.form</field>
+        <field name="model">customer.history</field>
+        <field name="arch" type="xml">
+            <form string="Lịch sử khách hàng">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_id" />
+                            <field name="date" />
+                            <field name="responsible_employee_id" />
+                        </group>
+                        <group>
+                            <field name="interested_products_ids" widget="many2many_tags"/>
+                            <field name="request_types_ids" widget="many2many_tags"/>
+                            <field name="note" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="customer_history_action" model="ir.actions.act_window">
+        <field name="name">Lịch sử khách hàng</field>
+        <field name="res_model">customer.history</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        id="customer_history_sub_menu"
+        name="Lịch sử khách hàng"
+        parent="sale.sale_menu_root"
+        sequence="15"/>
+    <menuitem id="customer_history_menu"
+        name="Lịch sử khách hàng"
+        action="customer_history_action"
+        parent="customer_history_sub_menu"
+        sequence="1"/>
+</odoo>
