@@ -5,4 +5,4 @@ class RequestType(models.Model):
     _description = 'Loại Yêu Cầu'
 
     name = fields.Char(string="Tên loại yêu cầu", required=True)
-    description = fields.Text(string="Mô tả")
+    x_description = fields.Text(string="Mô tả")
